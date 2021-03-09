@@ -1,0 +1,6 @@
+framework module Pods_ARIndoorApp {
+  umbrella header "Pods-ARIndoorApp-umbrella.h"
+
+  export *
+  module * { export * }
+}

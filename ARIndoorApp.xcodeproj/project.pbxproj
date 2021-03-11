@@ -49,6 +49,7 @@
 		FEDFCDF025F6515D00B778EF /* RealToSchemePositionMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDFCDEF25F6515D00B778EF /* RealToSchemePositionMapper.swift */; };
 		FEDFCDF325F67AA700B778EF /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDFCDF225F67AA700B778EF /* Math.swift */; };
 		FEDFCE0925F810EF00B778EF /* NavigationArroww.usdz in Resources */ = {isa = PBXBuildFile; fileRef = FEDFCE0825F810EF00B778EF /* NavigationArroww.usdz */; };
+		FEE2C37725FA74F400406850 /* SchemeGraphRouteCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE2C37625FA74F400406850 /* SchemeGraphRouteCalculator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -98,6 +99,7 @@
 		FEDFCDEF25F6515D00B778EF /* RealToSchemePositionMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealToSchemePositionMapper.swift; sourceTree = "<group>"; };
 		FEDFCDF225F67AA700B778EF /* Math.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
 		FEDFCE0825F810EF00B778EF /* NavigationArroww.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = NavigationArroww.usdz; sourceTree = "<group>"; };
+		FEE2C37625FA74F400406850 /* SchemeGraphRouteCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemeGraphRouteCalculator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -240,6 +242,7 @@
 				FEDFCDE925F3C5FD00B778EF /* QRCodeReader.swift */,
 				FEDFCDEC25F64D4B00B778EF /* SchemeSessionManager.swift */,
 				FEDFCDEF25F6515D00B778EF /* RealToSchemePositionMapper.swift */,
+				FEE2C37625FA74F400406850 /* SchemeGraphRouteCalculator.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -395,6 +398,7 @@
 				FEDFCDE125F3BD8800B778EF /* URLPerformer.swift in Sources */,
 				FE49CDFD25F3945700B74208 /* APIs.swift in Sources */,
 				FE892BE925CEE00700C0C6D0 /* MainScreenViewController.swift in Sources */,
+				FEE2C37725FA74F400406850 /* SchemeGraphRouteCalculator.swift in Sources */,
 				FE49CE0A25F3945700B74208 /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

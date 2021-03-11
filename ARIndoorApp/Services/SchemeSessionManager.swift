@@ -33,9 +33,12 @@ enum SchemeSessionState {
 
 final class SchemeSessionManager {
     
-    private(set) var fromNode: GraphNode
-    private(set) var toNode: GraphNode?
+    // MARK: - Public properties
+    
+    private(set) var currentPosition: SchemePosition
     let scheme: Scheme
+    
+    // MARK: - Constructors
     
     init?(userPosition: RealWorldPosition, qrId: String, scheme: Scheme) {
         guard let graph = scheme.graph else { return nil }
@@ -44,32 +47,80 @@ final class SchemeSessionManager {
         self.scheme = scheme
         fromNode = startNode
         realToSchemePositionMapper = RealToSchemePositionMapper(realWorldPosition: userPosition, schemePosition: startNode.schemePosition)
+        schemeGraphRouteCalculator = SchemeGraphRouteCalculator(schemeGraph: graph)
         currentPosition = startNode.schemePosition
     }
+    
+    // MARK: - Public Methods
     
     func startRoute(to roomdId: Int64) {
         guard let toNode = scheme.graph?.nodes.first(where: { $0.objId == roomdId }) else { return }
         
-        self.toNode = toNode
+        self.currentRoute = schemeGraphRouteCalculator.calculateRoute(fromNode: fromNode, toNode: toNode)
+        targetNode = currentRoute?[safe: 1]
+        if targetNode != nil {
+            targetNodeIndex = 1
+        }
     }
     
     func applyRealWorldPosition(_ position: RealWorldPosition) -> SchemeSessionState? {
         currentPosition = realToSchemePositionMapper.convert(position)
-        guard let toNode = toNode else { return nil }
+        guard let targetNode = targetNode else { return nil }
         
-        if currentPosition.distanceTo(toNode.schemePosition) < Static.distanceTreshold {
-            return .finish
+        if currentPosition.distanceTo(targetNode.schemePosition) < Static.distanceTreshold {
+            fromNode = targetNode
+            guard let currentRoute = currentRoute else { assert(false); return nil }
+            guard let targetNodeIndex = targetNodeIndex else { assert(false); return nil }
+            
+            let nextIndex = targetNodeIndex + 1
+            
+            if let nextNode = currentRoute[safe: nextIndex] {
+                self.targetNodeIndex = nextIndex
+                self.targetNode = nextNode
+                return applyRealWorldPosition(position)
+            } else {
+                self.targetNode = nil
+                self.targetNodeIndex = nil
+                self.currentRoute = nil
+                
+                return .finish
+            }
         }
         
-        if toNode.x == currentPosition.x {
-            let dir: Float = (toNode.y > currentPosition.y ? 1.0 : -1.0) * .pi / 2.0
-            return .direction(realToSchemePositionMapper.convertSchemeDirectionToReal(dir))
+        return .direction(calculateDirectionToCurrentPosition(targetNode: targetNode, currentPosition: currentPosition))
+    }
+    
+    // MARK: - Private properties
+    
+    private var fromNode: GraphNode
+    private var targetNode: GraphNode?
+    private var targetNodeIndex: Int?
+    private var currentRoute: [GraphNode]?
+    
+    private let realToSchemePositionMapper: RealToSchemePositionMapper
+    private let schemeGraphRouteCalculator: SchemeGraphRouteCalculator
+}
+
+private extension SchemeSessionManager {
+    
+    // MARK: - Private Nested Types
+    
+    private enum Static {
+        static let distanceTreshold: Float = 1.0
+    }
+    
+    // MARK: - Private Methods
+    
+    private func calculateDirectionToCurrentPosition(targetNode: GraphNode, currentPosition: SchemePosition) -> Float {
+        if targetNode.x == currentPosition.x {
+            let dir: Float = (targetNode.y > currentPosition.y ? 1.0 : -1.0) * .pi / 2.0
+            return realToSchemePositionMapper.convertSchemeDirectionToReal(dir)
         }
         
-        let isSecondQuarter = (toNode.y > currentPosition.y) && (toNode.x < currentPosition.x)
-        let isThirdQuarter = (toNode.y < currentPosition.y) && (toNode.x < currentPosition.x)
+        let isSecondQuarter = (targetNode.y > currentPosition.y) && (targetNode.x < currentPosition.x)
+        let isThirdQuarter = (targetNode.y < currentPosition.y) && (targetNode.x < currentPosition.x)
         
-        let routeTan = (toNode.y - currentPosition.y) / (toNode.x - currentPosition.x)
+        let routeTan = (targetNode.y - currentPosition.y) / (targetNode.x - currentPosition.x)
         
         let alpha = atan(routeTan)
         let routeDir: Float = {
@@ -80,19 +131,8 @@ final class SchemeSessionManager {
             return alpha
         }()
         
-        return .direction(realToSchemePositionMapper.convertSchemeDirectionToReal(routeDir))
+        return realToSchemePositionMapper.convertSchemeDirectionToReal(routeDir)
     }
-    
-    var currentPosition: SchemePosition
-    private let realToSchemePositionMapper: RealToSchemePositionMapper
-}
-
-private extension SchemeSessionManager {
-    
-    private enum Static {
-        static let distanceTreshold: Float = 1.0
-    }
-    
 }
 
 private extension GraphNode {

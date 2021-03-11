@@ -12,3 +12,14 @@ func apply<T>(_ obj: T, block: ((T) -> Void)) -> T {
     block(obj)
     return obj
 }
+
+extension Collection {
+    
+    subscript(safe index: Index) -> Element? {
+        if index < endIndex {
+            return self[index]
+        }
+        
+        return nil
+    }
+}

@@ -107,14 +107,20 @@ extension ARNavigationViewController: ARSessionDelegate {
             arView.scene.anchors.removeAll()
             arrowAnchor = nil
             if finishLabel.alpha == 0.0 {
+
                 UIView.animate(withDuration: 0.2) {
                     self.finishLabel.alpha = 1.0
                     self.finishLabel.transform = .init(scaleX: 3.0, y: 3.0)
+                } completion: { _ in
+                    self.schemeSessionManager = nil
+                    self.isScanningQR = true
                 }
             }
         case .none:
             arView.scene.anchors.removeAll()
             arrowAnchor = nil
+            schemeSessionManager = nil
+            isScanningQR = true
         }
         
         if let sm = schemeSessionManager {

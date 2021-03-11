@@ -48,6 +48,7 @@
 		FEDFCDED25F64D4B00B778EF /* SchemeSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDFCDEC25F64D4B00B778EF /* SchemeSessionManager.swift */; };
 		FEDFCDF025F6515D00B778EF /* RealToSchemePositionMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDFCDEF25F6515D00B778EF /* RealToSchemePositionMapper.swift */; };
 		FEDFCDF325F67AA700B778EF /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDFCDF225F67AA700B778EF /* Math.swift */; };
+		FEDFCE0925F810EF00B778EF /* NavigationArroww.usdz in Resources */ = {isa = PBXBuildFile; fileRef = FEDFCE0825F810EF00B778EF /* NavigationArroww.usdz */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,6 +97,7 @@
 		FEDFCDEC25F64D4B00B778EF /* SchemeSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemeSessionManager.swift; sourceTree = "<group>"; };
 		FEDFCDEF25F6515D00B778EF /* RealToSchemePositionMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealToSchemePositionMapper.swift; sourceTree = "<group>"; };
 		FEDFCDF225F67AA700B778EF /* Math.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
+		FEDFCE0825F810EF00B778EF /* NavigationArroww.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = NavigationArroww.usdz; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +213,7 @@
 			isa = PBXGroup;
 			children = (
 				FE76D7C125EA69D100147345 /* NavigationArrow.rcproject */,
+				FEDFCE0825F810EF00B778EF /* NavigationArroww.usdz */,
 				FE95BA1325B610E60098856A /* AppDelegate.swift */,
 				FE95BA1525B610E60098856A /* SceneDelegate.swift */,
 				FE95BA1725B610E60098856A /* ARNavigationViewController.swift */,
@@ -303,6 +306,7 @@
 				FE892BEC25D03DDD00C0C6D0 /* Main.storyboard in Resources */,
 				FE95BA2025B610E70098856A /* LaunchScreen.storyboard in Resources */,
 				FE95BA1D25B610E70098856A /* Assets.xcassets in Resources */,
+				FEDFCE0925F810EF00B778EF /* NavigationArroww.usdz in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

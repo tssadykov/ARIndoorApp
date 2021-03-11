@@ -34,6 +34,8 @@ class ARNavigationViewController: UIViewController {
 
     private let arView = ARView()
     private let picker = UIPickerView()
+    private let debugLabel = UILabel()
+    private let finishLabel = UILabel()
     
     private var isScanningQR: Bool = true
     private let deps: ARNavigationViewControllerDeps
@@ -62,6 +64,7 @@ extension ARNavigationViewController: ARSessionDelegate {
                             self.showAlert(title: "Failed qr code", description: nil)
                         case .success(let scheme):
                             self.schemeSessionManager = SchemeSessionManager(userPosition: rwp, qrId: qrId, scheme: scheme)
+                            self.picker.reloadAllComponents()
                         }
                     }
                 case .none:
@@ -76,16 +79,21 @@ extension ARNavigationViewController: ARSessionDelegate {
         
         switch sessionState {
         case .direction(let direction):
+            
+            if finishLabel.alpha != 0.0 {
+                UIView.animate(withDuration: 0.2) {
+                    self.finishLabel.alpha = 0.0
+                    self.finishLabel.transform = .init(scaleX: 0.0, y: 0.0)
+                }
+            }
+            
             let cameraTransform = frame.camera.transform
             var matrixTransform = matrix_identity_float4x4
-            matrixTransform[3][0] = cameraTransform[3][0]
-            matrixTransform[3][1] = cameraTransform[3][1] + 0.3
-            matrixTransform[3][2] = cameraTransform[3][2] + 0.3
-//            matrixTransform = Math.rotateAroundZ(matrix: matrixTransform, angle: .pi)
-//            matrixTransform = Math.rotateAroundX(matrix: matrixTransform, angle: .pi)
-//            matrixTransform = Math.rotateAroundY(matrix: matrixTransform, angle: .pi)
+            matrixTransform[3] = cameraTransform[3]
+            matrixTransform[3][1] -= 0.7
+            matrixTransform = Math.rotateAroundY(matrix: matrixTransform, angle: direction)
             
-            var inArrow = try! Entity.load(named: "NavigationArrow")
+            var inArrow = try! Entity.load(named: "NavigationArroww")
             let anchorEntity = AnchorEntity(world: matrixTransform)
             anchorEntity.addChild(inArrow)
         
@@ -105,6 +113,18 @@ extension ARNavigationViewController: ARSessionDelegate {
             
         case .finish, .none:
             arView.scene.anchors.forEach { arView.scene.removeAnchor($0) }
+            if finishLabel.alpha == 0.0 {
+                UIView.animate(withDuration: 0.2) {
+                    self.finishLabel.alpha = 1.0
+                    self.finishLabel.transform = .init(scaleX: 3.0, y: 3.0)
+                }
+            }
+        }
+        
+        if let sm = schemeSessionManager {
+            debugLabel.text = "SCHEME POSITION:\nx = \(sm.currentPosition.x);\ny = \(sm.currentPosition.y)"
+        } else {
+            debugLabel.text = "REAL POSITION:\nx = \(frame.camera.transform[3][0]);\nz = \(frame.camera.transform[3][2])"
         }
     }
 }
@@ -135,7 +155,7 @@ extension ARNavigationViewController: UIPickerViewDataSource, UIPickerViewDelega
 private extension ARCamera {
     
     var realWorldPosition: RealWorldPosition {
-        return RealWorldPosition(x: transform[3][0], y: transform[3][1], z: transform[3][2], direction: eulerAngles.z)
+        return RealWorldPosition(x: transform[3][0], y: transform[3][1], z: transform[3][2], direction: eulerAngles.y)
     }
 }
 
@@ -150,7 +170,7 @@ private extension ARNavigationViewController {
             
             let configuration = ARWorldTrackingConfiguration()
             configuration.planeDetection = [.horizontal, .vertical]
-            configuration.worldAlignment = .gravityAndHeading
+            configuration.worldAlignment = .gravity
             $0.session.run(configuration)
             
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -169,6 +189,29 @@ private extension ARNavigationViewController {
             $0.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
             $0.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
             $0.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        }
+        
+        apply(debugLabel) {
+            view.addSubview($0)
+            $0.textAlignment = .center
+            $0.numberOfLines = 0
+            $0.textColor = .gray
+            
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            $0.topAnchor.constraint(equalTo: view.topAnchor, constant: 30.0).isActive = true
+            $0.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15.0).isActive = true
+            $0.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15.0).isActive = true
+        }
+        
+        apply(finishLabel) {
+            view.addSubview($0)
+            $0.textAlignment = .center
+            
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            $0.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+            $0.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+            $0.text = "FINISH"
+            $0.textColor = .green
         }
     }
 }

@@ -65,3 +65,20 @@ final class Math {
         return float4x4(rows: rows)
     }
 }
+
+extension Float {
+    
+    func removeRadiansPeriod() -> Float {
+        var value = self
+        
+        while (abs(value) >= 2.0 * .pi) {
+            if value > 0 {
+                value -= 2.0 * .pi
+            } else {
+                value += 2.0 * .pi
+            }
+        }
+        
+        return value
+    }
+}

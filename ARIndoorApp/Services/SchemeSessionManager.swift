@@ -66,18 +66,11 @@ final class SchemeSessionManager {
         let routeTan = (toNode.y - currentPosition.y) / (toNode.x - currentPosition.x)
         
         let routeDir = atan(routeTan)
-        let currentDir = currentPosition.direction
         
-        var deltaDir = routeDir - currentDir
-        
-        if abs(deltaDir) >= 2 * Float.pi {
-            deltaDir /= 2 * Float.pi
-        }
-        
-        return .direction(deltaDir)
+        return .direction(realToSchemePositionMapper.convertSchemeDirectionToReal(routeDir))
     }
     
-    private var currentPosition: SchemePosition
+    var currentPosition: SchemePosition
     private let realToSchemePositionMapper: RealToSchemePositionMapper
 }
 

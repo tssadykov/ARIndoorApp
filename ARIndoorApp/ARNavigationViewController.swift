@@ -65,6 +65,7 @@ extension ARNavigationViewController: ARSessionDelegate {
                         case .success(let scheme):
                             self.schemeSessionManager = SchemeSessionManager(userPosition: rwp, qrId: qrId, scheme: scheme)
                             self.picker.reloadAllComponents()
+                            UIApplication.shared.isIdleTimerDisabled = true
                         }
                     }
                 case .none:
@@ -74,8 +75,6 @@ extension ARNavigationViewController: ARSessionDelegate {
         }
         
         let sessionState = schemeSessionManager?.applyRealWorldPosition(frame.camera.realWorldPosition)
-        
-        arView.scene.anchors.removeAll()
         
         switch sessionState {
         case .direction(let direction):
@@ -93,32 +92,29 @@ extension ARNavigationViewController: ARSessionDelegate {
             matrixTransform[3][1] -= 0.7
             matrixTransform = Math.rotateAroundY(matrix: matrixTransform, angle: direction)
             
-            var inArrow = try! Entity.load(named: "NavigationArroww")
-            let anchorEntity = AnchorEntity(world: matrixTransform)
-            anchorEntity.addChild(inArrow)
-        
-            arView.scene.addAnchor(anchorEntity)
-            self.arrowAnchor = anchorEntity
-            
-//            if arrowAnchor == nil {
-//                let inArrow = try! NavigationArrow.loadInArrow()
-//                let anchorEntity = AnchorEntity(world: matrixTransform)
-//                anchorEntity.addChild(inArrow)
-//                arView.scene.addAnchor(anchorEntity)
-//                self.arrowAnchor = anchorEntity
-//            } else {
-//                arrowAnchor?.reanchor(.world(transform: matrixTransform), preservingWorldTransform: false)
-//            }
+            if arrowAnchor == nil {
+                let inArrow = try! Entity.load(named: "NavigationArroww")
+                let anchorEntity = AnchorEntity(world: matrixTransform)
+                anchorEntity.addChild(inArrow)
+                arView.scene.addAnchor(anchorEntity)
+                self.arrowAnchor = anchorEntity
+            } else {
+                arrowAnchor?.reanchor(.world(transform: matrixTransform), preservingWorldTransform: false)
+            }
             
             
-        case .finish, .none:
-            arView.scene.anchors.forEach { arView.scene.removeAnchor($0) }
+        case .finish:
+            arView.scene.anchors.removeAll()
+            arrowAnchor = nil
             if finishLabel.alpha == 0.0 {
                 UIView.animate(withDuration: 0.2) {
                     self.finishLabel.alpha = 1.0
                     self.finishLabel.transform = .init(scaleX: 3.0, y: 3.0)
                 }
             }
+        case .none:
+            arView.scene.anchors.removeAll()
+            arrowAnchor = nil
         }
         
         if let sm = schemeSessionManager {
@@ -206,6 +202,7 @@ private extension ARNavigationViewController {
         apply(finishLabel) {
             view.addSubview($0)
             $0.textAlignment = .center
+            $0.alpha = 0.0
             
             $0.translatesAutoresizingMaskIntoConstraints = false
             $0.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true

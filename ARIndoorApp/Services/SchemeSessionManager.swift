@@ -45,8 +45,6 @@ final class SchemeSessionManager {
         fromNode = startNode
         realToSchemePositionMapper = RealToSchemePositionMapper(realWorldPosition: userPosition, schemePosition: startNode.schemePosition)
         currentPosition = startNode.schemePosition
-        
-        toNode = graph.nodes.first(where: { $0.qrId != nil && $0.qrId != qrId })
     }
     
     func startRoute(to roomdId: Int64) {
@@ -63,9 +61,24 @@ final class SchemeSessionManager {
             return .finish
         }
         
+        if toNode.x == currentPosition.x {
+            let dir: Float = (toNode.y > currentPosition.y ? 1.0 : -1.0) * .pi / 2.0
+            return .direction(realToSchemePositionMapper.convertSchemeDirectionToReal(dir))
+        }
+        
+        let isSecondQuarter = (toNode.y > currentPosition.y) && (toNode.x < currentPosition.x)
+        let isThirdQuarter = (toNode.y < currentPosition.y) && (toNode.x < currentPosition.x)
+        
         let routeTan = (toNode.y - currentPosition.y) / (toNode.x - currentPosition.x)
         
-        let routeDir = atan(routeTan)
+        let alpha = atan(routeTan)
+        let routeDir: Float = {
+            if isSecondQuarter || isThirdQuarter {
+                return .pi + alpha
+            }
+            
+            return alpha
+        }()
         
         return .direction(realToSchemePositionMapper.convertSchemeDirectionToReal(routeDir))
     }
@@ -77,7 +90,7 @@ final class SchemeSessionManager {
 private extension SchemeSessionManager {
     
     private enum Static {
-        static let distanceTreshold: Float = 1.5
+        static let distanceTreshold: Float = 1.0
     }
     
 }

@@ -68,7 +68,6 @@ final class SchemeSessionManager {
         guard let targetNode = targetNode else { return nil }
         
         if currentPosition.distanceTo(targetNode.schemePosition) < Static.distanceTreshold {
-            fromNode = targetNode
             guard let currentRoute = currentRoute else { assert(false); return nil }
             guard let targetNodeIndex = targetNodeIndex else { assert(false); return nil }
             
@@ -147,6 +146,6 @@ private extension GraphNode {
     }
     
     var schemePosition: SchemePosition {
-        return SchemePosition(x: x, y: y, z: z, direction: direction!)
+        return SchemePosition(x: x, y: y, z: z, direction: direction ?? 0.0)
     }
 }

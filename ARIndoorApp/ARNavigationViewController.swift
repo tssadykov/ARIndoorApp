@@ -112,6 +112,10 @@ extension ARNavigationViewController: ARSessionDelegate {
                     self.finishLabel.alpha = 1.0
                     self.finishLabel.transform = .init(scaleX: 3.0, y: 3.0)
                 } completion: { _ in
+                    UIView.animate(withDuration: 0.2, delay: 1.0, options: .curveLinear, animations: {
+                        self.finishLabel.alpha = 0.0
+                        self.finishLabel.transform = .init(scaleX: 0.0, y: 0.0)
+                    }, completion: nil)
                     self.schemeSessionManager = nil
                     self.isScanningQR = true
                 }
@@ -119,8 +123,6 @@ extension ARNavigationViewController: ARSessionDelegate {
         case .none:
             arView.scene.anchors.removeAll()
             arrowAnchor = nil
-            schemeSessionManager = nil
-            isScanningQR = true
         }
         
         if let sm = schemeSessionManager {

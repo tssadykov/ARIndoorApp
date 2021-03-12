@@ -23,3 +23,11 @@ extension Collection {
         return nil
     }
 }
+
+extension Float {
+    
+    func round(numberOfDecimals: Int) -> Float {
+        let divisor = pow(10, Double(numberOfDecimals))
+        return Float((divisor * Double(self)).rounded() / divisor)
+    }
+}

@@ -14,14 +14,14 @@ final class SchemeGraphRouteCalculator {
         
         let nodes = schemeGraph.nodes
         
-        var graph = [[Float]](repeating: [Float](repeating: 0.0, count: nodes.count), count: nodes.count)
+        var graph = [[Int]](repeating: [Int](repeating: 0, count: nodes.count), count: nodes.count)
         
         for edge in schemeGraph.edges {
             guard let nodeFrom = nodes.firstIndex(where: { $0._id == edge.node1Id }) else { assert(false); continue }
             guard let nodeTo = nodes.firstIndex(where: { $0._id == edge.node2Id }) else { assert(false); continue }
             
-            graph[nodeFrom][nodeTo] = edge.weight
-            graph[nodeTo][nodeFrom] = edge.weight
+            graph[nodeFrom][nodeTo] = Int(edge.weight * 100)
+            graph[nodeTo][nodeFrom] = Int(edge.weight * 100)
         }
         
         self.graph = graph
@@ -33,16 +33,16 @@ final class SchemeGraphRouteCalculator {
         guard let toNodeIndex = nodes.firstIndex(where: { $0._id == toNode._id }) else { assert(false); return [] }
         
         
-        var distances = [Float](repeating: .greatestFiniteMagnitude, count: nodes.count)
+        var distances = [Int](repeating: .max, count: nodes.count)
         var visits = [Bool](repeating: false, count: nodes.count)
         
-        distances[fromNodeIndex] = 0.0
+        distances[fromNodeIndex] = 0
         
         var minIndex = -1
         
         repeat {
             minIndex = -1
-            var min = Float.greatestFiniteMagnitude
+            var min = Int.max
             
             for i in (0..<nodes.count) {
                 if !visits[i] && distances[i] < min {
@@ -89,6 +89,6 @@ final class SchemeGraphRouteCalculator {
         return visitedNodes.reversed().map { nodes[$0] }
     }
     
-    private let graph: [[Float]]
+    private let graph: [[Int]]
     private let schemeGraph: SchemeGraph
 }

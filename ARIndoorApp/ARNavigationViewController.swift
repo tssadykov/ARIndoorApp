@@ -117,6 +117,7 @@ extension ARNavigationViewController: ARSessionDelegate {
                         self.finishLabel.transform = .init(scaleX: 0.0, y: 0.0)
                     }, completion: nil)
                     self.schemeSessionManager = nil
+                    self.picker.reloadAllComponents()
                     self.isScanningQR = true
                 }
             }

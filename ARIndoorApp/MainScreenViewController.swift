@@ -27,13 +27,14 @@ final class MainScreenViewController: UIViewController {
             
             $0.addTarget(self, action: #selector(onNavigationButton(_:)), for: .touchUpInside)
         }
+        
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     @objc
     private func onNavigationButton(_ sender: UIButton) {
         let arNavigationVC = ARNavigationViewController(deps: deps)
-        arNavigationVC.modalPresentationStyle = .fullScreen
-        present(arNavigationVC, animated: true, completion: nil)
+        navigationController?.pushViewController(arNavigationVC, animated: true)
     }
     
     // MARK: - Private properties

@@ -5,7 +5,8 @@
 //  Created by Timur Sadykov on 3/8/21.
 //
 
-import Foundation
+import RxCocoa
+import RxSwift
 
 struct RealWorldPosition {
     let x: Float
@@ -50,6 +51,15 @@ final class SchemeSessionManager {
             }
         }
         
+        var isRoute: Bool {
+            switch self {
+            case .route:
+                return true
+            default:
+                return false
+            }
+        }
+        
         var isPause: Bool {
             switch self {
             case .pause:
@@ -64,6 +74,15 @@ final class SchemeSessionManager {
             case .start(let sn), .route(let sn, _, _, _):
                 return sn
             case .pause:
+                return nil
+            }
+        }
+        
+        var routeCurrentNode: GraphNode? {
+            switch self {
+            case .route(_, let targetNodeIndex, _, let route):
+                return route[safe: targetNodeIndex - 1]
+            default:
                 return nil
             }
         }
@@ -84,6 +103,10 @@ final class SchemeSessionManager {
     let scheme: Scheme
     let rooms: [Room]
     
+    var isStart: Observable<Bool> {
+        return state.asObservable().map { $0.isStart }
+    }
+    
     // MARK: - Constructors
     
     init?(userPosition: RealWorldPosition, qrId: String, scheme: Scheme) {
@@ -91,7 +114,7 @@ final class SchemeSessionManager {
         
         self.scheme = scheme
         self.rooms = scheme.floors.flatMap { $0.rooms ?? [] }
-        state = .start(startNode: startNode)
+        state = BehaviorRelay(value: .start(startNode: startNode))
         realToSchemePositionMapper = RealToSchemePositionMapper(realWorldPosition: userPosition, schemePosition: startNode.schemePosition)
         schemeGraphRouteCalculator = SchemeGraphRouteCalculator(schemeGraph: scheme.graph)
         currentPosition = startNode.schemePosition
@@ -101,35 +124,35 @@ final class SchemeSessionManager {
     
     func startRoute(to roomdId: Int64) {
         guard let toNode = scheme.graph.nodes.first(where: { $0.objId == roomdId }) else { return }
-        guard state.isStart else { return }
-        guard let fromNode = state.startNode else { return }
+        guard state.value.isStart else { return }
+        guard let fromNode = state.value.startNode else { return }
         
         let currentRoute = schemeGraphRouteCalculator.calculateRoute(fromNode: fromNode, toNode: toNode)
         guard currentRoute.count > 1 else { return }
         
-        state = .route(startNode: fromNode, targetNodeIndex: 1, finishNode: toNode, route: currentRoute)
+        state.accept(.route(startNode: fromNode, targetNodeIndex: 1, finishNode: toNode, route: currentRoute))
     }
     
     func continueRoute(from qrId: String, userPosition: RealWorldPosition) {
         guard let startNode = scheme.graph.nodes.first(where: { $0.qrId == qrId }) else { return }
-        guard state.isPause else { return }
-        guard let finishNode = state.finishNode else { return }
+        guard state.value.isPause else { return }
+        guard let finishNode = state.value.finishNode else { return }
         
         realToSchemePositionMapper = RealToSchemePositionMapper(realWorldPosition: userPosition, schemePosition: startNode.schemePosition)
         
         let currentRoute = schemeGraphRouteCalculator.calculateRoute(fromNode: startNode, toNode: finishNode)
         guard currentRoute.count > 1 else {
-            state = .start(startNode: startNode)
+            state.accept(.start(startNode: startNode))
             return
         }
         
-        state = .route(startNode: startNode, targetNodeIndex: 1, finishNode: finishNode, route: currentRoute)
+        state.accept(.route(startNode: startNode, targetNodeIndex: 1, finishNode: finishNode, route: currentRoute))
     }
     
     func applyRealWorldPosition(_ position: RealWorldPosition) -> SchemeSessionState? {
         currentPosition = realToSchemePositionMapper.convert(position)
         
-        switch state {
+        switch state.value {
         case .route(let startNode, let targetNodeIndex, let finishNode, let route):
             let targetNode = route[targetNodeIndex]
             
@@ -139,13 +162,13 @@ final class SchemeSessionManager {
                 
                 if nextIndex < route.count {
                     if targetNode.isFloorMovement && targetNode.floorId != route[nextIndex].floorId {
-                        self.state = .pause(finishNode: finishNode)
+                        self.state.accept(.pause(finishNode: finishNode))
                         return .changeFloor(Int(route[nextIndex].floorId) + 1) // fix it
                     }
-                    self.state = .route(startNode: startNode, targetNodeIndex: nextIndex, finishNode: finishNode, route: route)
+                    self.state.accept(.route(startNode: startNode, targetNodeIndex: nextIndex, finishNode: finishNode, route: route))
                     return applyRealWorldPosition(position)
                 } else {
-                    self.state = .start(startNode: finishNode)
+                    self.state.accept(.start(startNode: finishNode))
                     
                     return .finish
                 }
@@ -159,7 +182,7 @@ final class SchemeSessionManager {
     
     // MARK: - Private properties
     
-    private var state: State
+    private let state: BehaviorRelay<State>
     
     private var realToSchemePositionMapper: RealToSchemePositionMapper
     private let schemeGraphRouteCalculator: SchemeGraphRouteCalculator

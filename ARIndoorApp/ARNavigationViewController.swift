@@ -8,6 +8,8 @@
 import UIKit
 import ARKit
 import RealityKit
+import RxCocoa
+import RxSwift
 
 protocol ARNavigationViewControllerDeps {
     var buildingSchemeService: BuildingSchemeService { get }
@@ -30,6 +32,7 @@ class ARNavigationViewController: UIViewController {
         super.viewDidLoad()
         
         setupViews()
+        setupBinds()
     }
 
     private let arView = ARView()
@@ -37,13 +40,15 @@ class ARNavigationViewController: UIViewController {
     private let debugLabel = UILabel()
     private let finishLabel = UILabel()
     private let changeFloorLabel = UILabel()
+    private let exitButton = UIButton()
     
     private var isScanningQR: Bool = true
     private let deps: ARNavigationViewControllerDeps
     
     private var arrowAnchor: AnchorEntity?
+    private let bag = DisposeBag()
     private lazy var inArrow = try! Entity.load(named: "NavigationArrow")
-    private var schemeSessionManager: SchemeSessionManager?
+    private let schemeSessionManager = BehaviorRelay<SchemeSessionManager?>(value: nil)
 }
 
 extension ARNavigationViewController: ARSessionDelegate {
@@ -64,10 +69,10 @@ extension ARNavigationViewController: ARSessionDelegate {
                         case .failure:
                             self.showAlert(title: "Failed qr code", description: nil)
                         case .success(let scheme):
-                            if let schemeSessionManager = self.schemeSessionManager, schemeSessionManager.scheme._id == schemeId {
+                            if let schemeSessionManager = self.schemeSessionManager.value, schemeSessionManager.scheme._id == schemeId {
                                 schemeSessionManager.continueRoute(from: qrId, userPosition: rwp)
                             } else {
-                                self.schemeSessionManager = SchemeSessionManager(userPosition: rwp, qrId: qrId, scheme: scheme)
+                                self.schemeSessionManager.accept(SchemeSessionManager(userPosition: rwp, qrId: qrId, scheme: scheme))
                             }
                             self.picker.reloadAllComponents()
                             UIApplication.shared.isIdleTimerDisabled = true
@@ -81,7 +86,7 @@ extension ARNavigationViewController: ARSessionDelegate {
             return
         }
         
-        let sessionState = schemeSessionManager?.applyRealWorldPosition(frame.camera.realWorldPosition)
+        let sessionState = schemeSessionManager.value?.applyRealWorldPosition(frame.camera.realWorldPosition)
         
         switch sessionState {
         case .direction(let direction):
@@ -129,7 +134,7 @@ extension ARNavigationViewController: ARSessionDelegate {
                         self.finishLabel.alpha = 0.0
                         self.finishLabel.transform = .init(scaleX: 0.0, y: 0.0)
                     }, completion: nil)
-                    self.schemeSessionManager = nil
+                    self.schemeSessionManager.accept(nil)
                     self.picker.reloadAllComponents()
                     self.isScanningQR = true
                 }
@@ -139,7 +144,7 @@ extension ARNavigationViewController: ARSessionDelegate {
             arrowAnchor = nil
         }
         
-        if let sm = schemeSessionManager {
+        if let sm = schemeSessionManager.value {
             debugLabel.text = "SCHEME POSITION:\nx = \(sm.currentPosition.x);\ny = \(sm.currentPosition.y)"
         } else {
             debugLabel.text = "REAL POSITION:\nx = \(frame.camera.transform[3][0]);\nz = \(frame.camera.transform[3][2])"
@@ -154,19 +159,19 @@ extension ARNavigationViewController: UIPickerViewDataSource, UIPickerViewDelega
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return schemeSessionManager?.rooms.count ?? 0
+        return schemeSessionManager.value?.rooms.count ?? 0
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return schemeSessionManager?.rooms[row].name
+        return schemeSessionManager.value?.rooms[row].name
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        guard let selectedRoomId = schemeSessionManager?.rooms[row]._id else {
+        guard let selectedRoomId = schemeSessionManager.value?.rooms[row]._id else {
             return
         }
         
-        schemeSessionManager?.startRoute(to: selectedRoomId)
+        schemeSessionManager.value?.startRoute(to: selectedRoomId)
     }
 }
 
@@ -242,5 +247,33 @@ private extension ARNavigationViewController {
             $0.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
             $0.textColor = .green
         }
+        
+        apply(exitButton) {
+            view.addSubview($0)
+            $0.setTitle("Back", for: .normal)
+            $0.backgroundColor = .clear
+            $0.setTitleColor(.blue, for: .normal)
+            
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            $0.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10.0).isActive = true
+            $0.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25.0).isActive = true
+        }
+    }
+    
+    private func setupBinds() {
+        schemeSessionManager
+            .flatMapLatest {
+                return $0?.isStart ?? .just(false)
+            }
+            .bind { [weak self] isStart in
+                self?.picker.isHidden = !isStart
+            }
+            .disposed(by: bag)
+        
+        exitButton.rx.tap
+            .bind { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: bag)
     }
 }

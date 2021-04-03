@@ -5,4 +5,6 @@ target 'ARIndoorApp' do
 	use_frameworks!
 
 	pod "Alamofire", '~> 4.0'
+  pod "RxSwift"
+  pod "RxCocoa"
 end

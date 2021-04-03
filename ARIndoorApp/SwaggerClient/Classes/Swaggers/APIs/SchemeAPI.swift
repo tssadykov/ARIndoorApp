@@ -274,25 +274,25 @@ open class SchemeAPI {
     "doors" : [ {
       "y1" : 1.5,
       "width" : 1.0,
-      "room2_id" : 5,
+      "room2_id" : 9,
       "x1" : 2.3,
       "y2" : 1.9,
       "x2" : 2.6,
-      "id" : 6,
-      "wall1_id" : 7,
-      "wall2_id" : 1,
-      "room1_id" : 4
+      "id" : 7,
+      "wall1_id" : 1,
+      "wall2_id" : 4,
+      "room1_id" : 5
     }, {
       "y1" : 1.5,
       "width" : 1.0,
-      "room2_id" : 5,
+      "room2_id" : 9,
       "x1" : 2.3,
       "y2" : 1.9,
       "x2" : 2.6,
-      "id" : 6,
-      "wall1_id" : 7,
-      "wall2_id" : 1,
-      "room1_id" : 4
+      "id" : 7,
+      "wall1_id" : 1,
+      "wall2_id" : 4,
+      "room1_id" : 5
     } ],
     "rooms" : [ {
       "walls" : [ {
@@ -301,16 +301,16 @@ open class SchemeAPI {
         "y2" : 0.7,
         "x2" : 0.7,
         "id" : 5,
-        "wall1_id" : 5,
-        "wall2_id" : 2
+        "wall_prev_id" : 2,
+        "wall_next_id" : 5
       }, {
         "y1" : 1.3,
         "x1" : 2.3,
         "y2" : 0.7,
         "x2" : 0.7,
         "id" : 5,
-        "wall1_id" : 5,
-        "wall2_id" : 2
+        "wall_prev_id" : 2,
+        "wall_next_id" : 5
       } ],
       "staircases" : [ {
         "staircase_up_id" : 7,
@@ -320,7 +320,7 @@ open class SchemeAPI {
         "id" : 4,
         "staircase_down_id" : 1,
         "height" : 1.3,
-        "direction" : 90.0
+        "direction" : 3.14
       }, {
         "staircase_up_id" : 7,
         "x" : 2.3,
@@ -329,22 +329,37 @@ open class SchemeAPI {
         "id" : 4,
         "staircase_down_id" : 1,
         "height" : 1.3,
-        "direction" : 90.0
+        "direction" : 3.14
       } ],
       "qrs" : [ {
-        "wall_id" : 1,
+        "wall_id" : 6,
         "x" : 2.3,
         "y" : 1.3,
         "z" : 1.3,
         "id" : 1,
-        "direction" : 270.0
+        "direction" : 3.14
       }, {
-        "wall_id" : 1,
+        "wall_id" : 6,
         "x" : 2.3,
         "y" : 1.3,
         "z" : 1.3,
         "id" : 1,
-        "direction" : 270.0
+        "direction" : 3.14
+      } ],
+      "furniture" : [ {
+        "name" : "Стол",
+        "y1" : 1.3,
+        "x1" : 2.3,
+        "y2" : 2.3,
+        "x2" : 1.3,
+        "id" : 1
+      }, {
+        "name" : "Стол",
+        "y1" : 1.3,
+        "x1" : 2.3,
+        "y2" : 2.3,
+        "x2" : 1.3,
+        "id" : 1
       } ],
       "can_search" : true,
       "name" : "Кабинет №412",
@@ -374,16 +389,16 @@ open class SchemeAPI {
         "y2" : 0.7,
         "x2" : 0.7,
         "id" : 5,
-        "wall1_id" : 5,
-        "wall2_id" : 2
+        "wall_prev_id" : 2,
+        "wall_next_id" : 5
       }, {
         "y1" : 1.3,
         "x1" : 2.3,
         "y2" : 0.7,
         "x2" : 0.7,
         "id" : 5,
-        "wall1_id" : 5,
-        "wall2_id" : 2
+        "wall_prev_id" : 2,
+        "wall_next_id" : 5
       } ],
       "staircases" : [ {
         "staircase_up_id" : 7,
@@ -393,7 +408,7 @@ open class SchemeAPI {
         "id" : 4,
         "staircase_down_id" : 1,
         "height" : 1.3,
-        "direction" : 90.0
+        "direction" : 3.14
       }, {
         "staircase_up_id" : 7,
         "x" : 2.3,
@@ -402,22 +417,37 @@ open class SchemeAPI {
         "id" : 4,
         "staircase_down_id" : 1,
         "height" : 1.3,
-        "direction" : 90.0
+        "direction" : 3.14
       } ],
       "qrs" : [ {
-        "wall_id" : 1,
+        "wall_id" : 6,
         "x" : 2.3,
         "y" : 1.3,
         "z" : 1.3,
         "id" : 1,
-        "direction" : 270.0
+        "direction" : 3.14
       }, {
-        "wall_id" : 1,
+        "wall_id" : 6,
         "x" : 2.3,
         "y" : 1.3,
         "z" : 1.3,
         "id" : 1,
-        "direction" : 270.0
+        "direction" : 3.14
+      } ],
+      "furniture" : [ {
+        "name" : "Стол",
+        "y1" : 1.3,
+        "x1" : 2.3,
+        "y2" : 2.3,
+        "x2" : 1.3,
+        "id" : 1
+      }, {
+        "name" : "Стол",
+        "y1" : 1.3,
+        "x1" : 2.3,
+        "y2" : 2.3,
+        "x2" : 1.3,
+        "id" : 1
       } ],
       "can_search" : true,
       "name" : "Кабинет №412",
@@ -447,25 +477,25 @@ open class SchemeAPI {
     "doors" : [ {
       "y1" : 1.5,
       "width" : 1.0,
-      "room2_id" : 5,
+      "room2_id" : 9,
       "x1" : 2.3,
       "y2" : 1.9,
       "x2" : 2.6,
-      "id" : 6,
-      "wall1_id" : 7,
-      "wall2_id" : 1,
-      "room1_id" : 4
+      "id" : 7,
+      "wall1_id" : 1,
+      "wall2_id" : 4,
+      "room1_id" : 5
     }, {
       "y1" : 1.5,
       "width" : 1.0,
-      "room2_id" : 5,
+      "room2_id" : 9,
       "x1" : 2.3,
       "y2" : 1.9,
       "x2" : 2.6,
-      "id" : 6,
-      "wall1_id" : 7,
-      "wall2_id" : 1,
-      "room1_id" : 4
+      "id" : 7,
+      "wall1_id" : 1,
+      "wall2_id" : 4,
+      "room1_id" : 5
     } ],
     "rooms" : [ {
       "walls" : [ {
@@ -474,16 +504,16 @@ open class SchemeAPI {
         "y2" : 0.7,
         "x2" : 0.7,
         "id" : 5,
-        "wall1_id" : 5,
-        "wall2_id" : 2
+        "wall_prev_id" : 2,
+        "wall_next_id" : 5
       }, {
         "y1" : 1.3,
         "x1" : 2.3,
         "y2" : 0.7,
         "x2" : 0.7,
         "id" : 5,
-        "wall1_id" : 5,
-        "wall2_id" : 2
+        "wall_prev_id" : 2,
+        "wall_next_id" : 5
       } ],
       "staircases" : [ {
         "staircase_up_id" : 7,
@@ -493,7 +523,7 @@ open class SchemeAPI {
         "id" : 4,
         "staircase_down_id" : 1,
         "height" : 1.3,
-        "direction" : 90.0
+        "direction" : 3.14
       }, {
         "staircase_up_id" : 7,
         "x" : 2.3,
@@ -502,22 +532,37 @@ open class SchemeAPI {
         "id" : 4,
         "staircase_down_id" : 1,
         "height" : 1.3,
-        "direction" : 90.0
+        "direction" : 3.14
       } ],
       "qrs" : [ {
-        "wall_id" : 1,
+        "wall_id" : 6,
         "x" : 2.3,
         "y" : 1.3,
         "z" : 1.3,
         "id" : 1,
-        "direction" : 270.0
+        "direction" : 3.14
       }, {
-        "wall_id" : 1,
+        "wall_id" : 6,
         "x" : 2.3,
         "y" : 1.3,
         "z" : 1.3,
         "id" : 1,
-        "direction" : 270.0
+        "direction" : 3.14
+      } ],
+      "furniture" : [ {
+        "name" : "Стол",
+        "y1" : 1.3,
+        "x1" : 2.3,
+        "y2" : 2.3,
+        "x2" : 1.3,
+        "id" : 1
+      }, {
+        "name" : "Стол",
+        "y1" : 1.3,
+        "x1" : 2.3,
+        "y2" : 2.3,
+        "x2" : 1.3,
+        "id" : 1
       } ],
       "can_search" : true,
       "name" : "Кабинет №412",
@@ -547,16 +592,16 @@ open class SchemeAPI {
         "y2" : 0.7,
         "x2" : 0.7,
         "id" : 5,
-        "wall1_id" : 5,
-        "wall2_id" : 2
+        "wall_prev_id" : 2,
+        "wall_next_id" : 5
       }, {
         "y1" : 1.3,
         "x1" : 2.3,
         "y2" : 0.7,
         "x2" : 0.7,
         "id" : 5,
-        "wall1_id" : 5,
-        "wall2_id" : 2
+        "wall_prev_id" : 2,
+        "wall_next_id" : 5
       } ],
       "staircases" : [ {
         "staircase_up_id" : 7,
@@ -566,7 +611,7 @@ open class SchemeAPI {
         "id" : 4,
         "staircase_down_id" : 1,
         "height" : 1.3,
-        "direction" : 90.0
+        "direction" : 3.14
       }, {
         "staircase_up_id" : 7,
         "x" : 2.3,
@@ -575,22 +620,37 @@ open class SchemeAPI {
         "id" : 4,
         "staircase_down_id" : 1,
         "height" : 1.3,
-        "direction" : 90.0
+        "direction" : 3.14
       } ],
       "qrs" : [ {
-        "wall_id" : 1,
+        "wall_id" : 6,
         "x" : 2.3,
         "y" : 1.3,
         "z" : 1.3,
         "id" : 1,
-        "direction" : 270.0
+        "direction" : 3.14
       }, {
-        "wall_id" : 1,
+        "wall_id" : 6,
         "x" : 2.3,
         "y" : 1.3,
         "z" : 1.3,
         "id" : 1,
-        "direction" : 270.0
+        "direction" : 3.14
+      } ],
+      "furniture" : [ {
+        "name" : "Стол",
+        "y1" : 1.3,
+        "x1" : 2.3,
+        "y2" : 2.3,
+        "x2" : 1.3,
+        "id" : 1
+      }, {
+        "name" : "Стол",
+        "y1" : 1.3,
+        "x1" : 2.3,
+        "y2" : 2.3,
+        "x2" : 1.3,
+        "id" : 1
       } ],
       "can_search" : true,
       "name" : "Кабинет №412",
@@ -622,32 +682,34 @@ open class SchemeAPI {
   "id" : 0,
   "graph" : {
     "nodes" : [ {
-      "obj_id" : 9,
+      "obj_id" : 8,
       "x" : 2.3,
       "y" : 1.3,
+      "floor_id" : 6,
       "z" : 0.7,
       "obj_type" : "in_room",
       "id" : 9,
-      "direction" : 90.0
+      "direction" : 3.14
     }, {
-      "obj_id" : 9,
+      "obj_id" : 8,
       "x" : 2.3,
       "y" : 1.3,
+      "floor_id" : 6,
       "z" : 0.7,
       "obj_type" : "in_room",
       "id" : 9,
-      "direction" : 90.0
+      "direction" : 3.14
     } ],
     "edges" : [ {
       "weight" : 5.76,
-      "id" : 6,
-      "node1_id" : 8,
-      "node2_id" : 9
+      "id" : 9,
+      "node1_id" : 6,
+      "node2_id" : 3
     }, {
       "weight" : 5.76,
-      "id" : 6,
-      "node1_id" : 8,
-      "node2_id" : 9
+      "id" : 9,
+      "node1_id" : 6,
+      "node2_id" : 3
     } ]
   }
 }}]

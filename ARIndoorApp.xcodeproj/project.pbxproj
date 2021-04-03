@@ -50,6 +50,7 @@
 		FEDFCDF325F67AA700B778EF /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDFCDF225F67AA700B778EF /* Math.swift */; };
 		FEDFCE0925F810EF00B778EF /* NavigationArroww.usdz in Resources */ = {isa = PBXBuildFile; fileRef = FEDFCE0825F810EF00B778EF /* NavigationArroww.usdz */; };
 		FEE2C37725FA74F400406850 /* SchemeGraphRouteCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE2C37625FA74F400406850 /* SchemeGraphRouteCalculator.swift */; };
+		FEE2C48326022CBB00406850 /* Furniture.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE2C48226022CBB00406850 /* Furniture.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -100,6 +101,7 @@
 		FEDFCDF225F67AA700B778EF /* Math.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
 		FEDFCE0825F810EF00B778EF /* NavigationArroww.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = NavigationArroww.usdz; sourceTree = "<group>"; };
 		FEE2C37625FA74F400406850 /* SchemeGraphRouteCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemeGraphRouteCalculator.swift; sourceTree = "<group>"; };
+		FEE2C48226022CBB00406850 /* Furniture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Furniture.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +182,7 @@
 				FE49CDE725F3945700B74208 /* GraphEdge.swift */,
 				FE49CDE825F3945700B74208 /* SchemeGraph.swift */,
 				FE49CDE925F3945700B74208 /* Room.swift */,
+				FEE2C48226022CBB00406850 /* Furniture.swift */,
 				FE49CDEA25F3945700B74208 /* InlineResponse200.swift */,
 				FE49CDEB25F3945700B74208 /* Scheme.swift */,
 				FE49CDEC25F3945700B74208 /* Staircase.swift */,
@@ -375,6 +378,7 @@
 				FE49CE1125F39AFB00B74208 /* BuildingSchemeService.swift in Sources */,
 				FE49CE0C25F3945700B74208 /* Models.swift in Sources */,
 				FE49CE0925F3945700B74208 /* Floor.swift in Sources */,
+				FEE2C48326022CBB00406850 /* Furniture.swift in Sources */,
 				FE49CDFA25F3945700B74208 /* SchemeAPI.swift in Sources */,
 				FEDFCDF025F6515D00B778EF /* RealToSchemePositionMapper.swift in Sources */,
 				FE49CDFF25F3945700B74208 /* SchemeGraph.swift in Sources */,

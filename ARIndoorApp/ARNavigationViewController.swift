@@ -36,6 +36,7 @@ class ARNavigationViewController: UIViewController {
     private let picker = UIPickerView()
     private let debugLabel = UILabel()
     private let finishLabel = UILabel()
+    private let changeFloorLabel = UILabel()
     
     private var isScanningQR: Bool = true
     private let deps: ARNavigationViewControllerDeps
@@ -63,7 +64,11 @@ extension ARNavigationViewController: ARSessionDelegate {
                         case .failure:
                             self.showAlert(title: "Failed qr code", description: nil)
                         case .success(let scheme):
-                            self.schemeSessionManager = SchemeSessionManager(userPosition: rwp, qrId: qrId, scheme: scheme)
+                            if let schemeSessionManager = self.schemeSessionManager, schemeSessionManager.scheme._id == schemeId {
+                                schemeSessionManager.continueRoute(from: qrId, userPosition: rwp)
+                            } else {
+                                self.schemeSessionManager = SchemeSessionManager(userPosition: rwp, qrId: qrId, scheme: scheme)
+                            }
                             self.picker.reloadAllComponents()
                             UIApplication.shared.isIdleTimerDisabled = true
                         }
@@ -72,12 +77,15 @@ extension ARNavigationViewController: ARSessionDelegate {
                     return
                 }
             }
+            
+            return
         }
         
         let sessionState = schemeSessionManager?.applyRealWorldPosition(frame.camera.realWorldPosition)
         
         switch sessionState {
         case .direction(let direction):
+            changeFloorLabel.isHidden = true
             
             if finishLabel.alpha != 0.0 {
                 UIView.animate(withDuration: 0.2) {
@@ -102,10 +110,15 @@ extension ARNavigationViewController: ARSessionDelegate {
                 arrowAnchor?.reanchor(.world(transform: matrixTransform), preservingWorldTransform: false)
             }
             
+        case .changeFloor(let floor):
+            isScanningQR = true
+            changeFloorLabel.isHidden = false
+            changeFloorLabel.text = "Go to floor \(floor)"
             
         case .finish:
             arView.scene.anchors.removeAll()
             arrowAnchor = nil
+            changeFloorLabel.isHidden = true
             if finishLabel.alpha == 0.0 {
 
                 UIView.animate(withDuration: 0.2) {
@@ -137,19 +150,19 @@ extension ARNavigationViewController: ARSessionDelegate {
 extension ARNavigationViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return schemeSessionManager?.scheme.floors?.count ?? 0
+        return 1
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return schemeSessionManager?.scheme.floors?[component].rooms?.count ?? 0
+        return schemeSessionManager?.rooms.count ?? 0
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return schemeSessionManager?.scheme.floors?[component].rooms?[row].name
+        return schemeSessionManager?.rooms[row].name
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        guard let selectedRoomId = schemeSessionManager?.scheme.floors?[component].rooms?[row]._id else {
+        guard let selectedRoomId = schemeSessionManager?.rooms[row]._id else {
             return
         }
         
@@ -217,6 +230,16 @@ private extension ARNavigationViewController {
             $0.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
             $0.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
             $0.text = "FINISH"
+            $0.textColor = .green
+        }
+        
+        apply(changeFloorLabel) {
+            view.addSubview($0)
+            $0.textAlignment = .center
+            
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            $0.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+            $0.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
             $0.textColor = .green
         }
     }

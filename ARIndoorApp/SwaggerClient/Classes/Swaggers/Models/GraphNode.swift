@@ -19,6 +19,7 @@ public struct GraphNode: Codable {
         case qr = "qr"
     }
     public var _id: Int64
+    public var floorId: Int64
     public var x: Float
     public var y: Float
     public var z: Float
@@ -26,8 +27,9 @@ public struct GraphNode: Codable {
     public var objId: Int64
     public var objType: ObjType
 
-    public init(_id: Int64, x: Float, y: Float, z: Float, direction: Float? = nil, objId: Int64, objType: ObjType) {
+    public init(_id: Int64, floorId: Int64, x: Float, y: Float, z: Float, direction: Float? = nil, objId: Int64, objType: ObjType) {
         self._id = _id
+        self.floorId = floorId
         self.x = x
         self.y = y
         self.z = z
@@ -38,6 +40,7 @@ public struct GraphNode: Codable {
 
     public enum CodingKeys: String, CodingKey { 
         case _id = "id"
+        case floorId = "floor_id"
         case x
         case y
         case z

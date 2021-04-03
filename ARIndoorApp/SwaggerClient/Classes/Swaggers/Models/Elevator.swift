@@ -15,11 +15,11 @@ public struct Elevator: Codable {
     public var x: Float
     public var y: Float
     public var direction: Float
-    public var wallId: Int64?
+    public var wallId: Int64
     public var elevatorUpId: Int64?
     public var elevatorDownId: Int64?
 
-    public init(_id: Int64, x: Float, y: Float, direction: Float, wallId: Int64? = nil, elevatorUpId: Int64? = nil, elevatorDownId: Int64? = nil) {
+    public init(_id: Int64, x: Float, y: Float, direction: Float, wallId: Int64, elevatorUpId: Int64? = nil, elevatorDownId: Int64? = nil) {
         self._id = _id
         self.x = x
         self.y = y

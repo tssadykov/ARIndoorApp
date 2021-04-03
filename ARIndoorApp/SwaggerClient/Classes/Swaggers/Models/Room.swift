@@ -18,9 +18,10 @@ public struct Room: Codable {
     public var walls: [Wall]
     public var elevators: [Elevator]?
     public var staircases: [Staircase]?
+    public var furniture: [Furniture]?
     public var qrs: [QR]?
 
-    public init(_id: Int64, name: String, _description: String, canSearch: Bool, walls: [Wall], elevators: [Elevator]? = nil, staircases: [Staircase]? = nil, qrs: [QR]? = nil) {
+    public init(_id: Int64, name: String, _description: String, canSearch: Bool, walls: [Wall], elevators: [Elevator]? = nil, staircases: [Staircase]? = nil, furniture: [Furniture]? = nil, qrs: [QR]? = nil) {
         self._id = _id
         self.name = name
         self._description = _description
@@ -28,6 +29,7 @@ public struct Room: Codable {
         self.walls = walls
         self.elevators = elevators
         self.staircases = staircases
+        self.furniture = furniture
         self.qrs = qrs
     }
 
@@ -39,6 +41,7 @@ public struct Room: Codable {
         case walls
         case elevators
         case staircases
+        case furniture
         case qrs
     }
 

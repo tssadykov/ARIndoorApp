@@ -15,10 +15,10 @@ public struct Scheme: Codable {
     public var name: String
     public var _description: String
     public var address: String
-    public var floors: [Floor]?
-    public var graph: SchemeGraph?
+    public var floors: [Floor]
+    public var graph: SchemeGraph
 
-    public init(_id: Int64, name: String, _description: String, address: String, floors: [Floor]? = nil, graph: SchemeGraph? = nil) {
+    public init(_id: Int64, name: String, _description: String, address: String, floors: [Floor], graph: SchemeGraph) {
         self._id = _id
         self.name = name
         self._description = _description

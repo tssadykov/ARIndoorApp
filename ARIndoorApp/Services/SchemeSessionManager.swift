@@ -31,6 +31,7 @@ enum SchemeSessionState {
     case finish
     case direction(Float)
     case changeFloor(Int)
+    case callibrate
 }
 
 final class SchemeSessionManager {
@@ -38,6 +39,7 @@ final class SchemeSessionManager {
     // MARK: - Public Nested Types
     
     enum State {
+        case pauseStart
         case start(startNode: GraphNode)
         case pause(finishNode: GraphNode)
         case route(startNode: GraphNode, targetNodeIndex: Int, finishNode: GraphNode, route: [GraphNode])
@@ -62,7 +64,7 @@ final class SchemeSessionManager {
         
         var isPause: Bool {
             switch self {
-            case .pause:
+            case .pause, .pauseStart:
                 return true
             default:
                 return false
@@ -73,7 +75,7 @@ final class SchemeSessionManager {
             switch self {
             case .start(let sn), .route(let sn, _, _, _):
                 return sn
-            case .pause:
+            case .pause, .pauseStart:
                 return nil
             }
         }
@@ -91,7 +93,7 @@ final class SchemeSessionManager {
             switch self {
             case .route(_, _, let finishNode, _), .pause(let finishNode):
                 return finishNode
-            case .start:
+            case .start, .pauseStart:
                 return nil
             }
         }
@@ -127,6 +129,7 @@ final class SchemeSessionManager {
         guard state.value.isStart else { return }
         guard let fromNode = state.value.startNode else { return }
         
+        distanceCovered = 0.0
         let currentRoute = schemeGraphRouteCalculator.calculateRoute(fromNode: fromNode, toNode: toNode)
         guard currentRoute.count > 1 else { return }
         
@@ -136,9 +139,13 @@ final class SchemeSessionManager {
     func continueRoute(from qrId: String, userPosition: RealWorldPosition) {
         guard let startNode = scheme.graph.nodes.first(where: { $0.qrId == qrId }) else { return }
         guard state.value.isPause else { return }
-        guard let finishNode = state.value.finishNode else { return }
-        
+        distanceCovered = 0.0
         realToSchemePositionMapper = RealToSchemePositionMapper(realWorldPosition: userPosition, schemePosition: startNode.schemePosition)
+        
+        guard let finishNode = state.value.finishNode else {
+            state.accept(.start(startNode: startNode))
+            return
+        }
         
         let currentRoute = schemeGraphRouteCalculator.calculateRoute(fromNode: startNode, toNode: finishNode)
         guard currentRoute.count > 1 else {
@@ -150,7 +157,10 @@ final class SchemeSessionManager {
     }
     
     func applyRealWorldPosition(_ position: RealWorldPosition) -> SchemeSessionState? {
+        let lastPosition = currentPosition
         currentPosition = realToSchemePositionMapper.convert(position)
+        
+        distanceCovered += currentPosition.distanceTo(lastPosition)
         
         switch state.value {
         case .route(let startNode, let targetNodeIndex, let finishNode, let route):
@@ -172,9 +182,18 @@ final class SchemeSessionManager {
                     
                     return .finish
                 }
+            } else if distanceCovered > Static.distanceRouteCoveredTreshold {
+                self.state.accept(.pause(finishNode: finishNode))
             }
             
             return .direction(calculateDirectionToCurrentPosition(targetNode: targetNode, currentPosition: currentPosition))
+        case .start:
+            if distanceCovered > Static.distanceStartCoveredTreshold {
+                self.state.accept(.pauseStart)
+                return .callibrate
+            }
+            
+            return nil
         default:
             return nil
         }
@@ -186,6 +205,8 @@ final class SchemeSessionManager {
     
     private var realToSchemePositionMapper: RealToSchemePositionMapper
     private let schemeGraphRouteCalculator: SchemeGraphRouteCalculator
+    
+    private var distanceCovered: Float = 0.0
 }
 
 private extension SchemeSessionManager {
@@ -194,6 +215,8 @@ private extension SchemeSessionManager {
     
     private enum Static {
         static let distanceTreshold: Float = 1.0
+        static let distanceRouteCoveredTreshold: Float = 30.0
+        static let distanceStartCoveredTreshold: Float = 3.0
     }
     
     // MARK: - Private Methods

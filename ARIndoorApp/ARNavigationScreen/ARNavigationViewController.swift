@@ -15,6 +15,7 @@ protocol ARNavigationViewControllerDeps {
     var buildingSchemeService: BuildingSchemeService { get }
     var urlPerformer: URLPerformer { get }
     var qrCodeReader: QRCodeReader { get }
+    var schemeCacheService: SchemeCacheService { get }
 }
 
 class ARNavigationViewController: UIViewController {
@@ -36,10 +37,9 @@ class ARNavigationViewController: UIViewController {
     }
 
     private let arView = ARView()
-    private let picker = UIPickerView()
+    private let selectRoomButton = UIButton()
     private let debugLabel = UILabel()
     private let finishLabel = UILabel()
-    private let changeFloorLabel = UILabel()
     private let exitButton = UIButton()
     
     private var isScanningQR: Bool = true
@@ -49,6 +49,9 @@ class ARNavigationViewController: UIViewController {
     private let bag = DisposeBag()
     private lazy var inArrow = try! Entity.load(named: "NavigationArrow")
     private let schemeSessionManager = BehaviorRelay<SchemeSessionManager?>(value: nil)
+    
+    private let saveButton = UIButton()
+    private let arNavigationBar = ARNavigationBarViewController()
 }
 
 extension ARNavigationViewController: ARSessionDelegate {
@@ -65,17 +68,28 @@ extension ARNavigationViewController: ARSessionDelegate {
                 switch task {
                 case .openScheme(let schemeId, let qrId):
                     self.deps.buildingSchemeService.loadScheme(for: schemeId) { result in
-                        switch result {
-                        case .failure:
-                            self.showAlert(title: "Failed qr code", description: nil)
-                        case .success(let scheme):
+                        let onSuccessScheme: (Scheme) -> Void = { scheme in
                             if let schemeSessionManager = self.schemeSessionManager.value, schemeSessionManager.scheme._id == schemeId {
                                 schemeSessionManager.continueRoute(from: qrId, userPosition: rwp)
                             } else {
                                 self.schemeSessionManager.accept(SchemeSessionManager(userPosition: rwp, qrId: qrId, scheme: scheme))
                             }
-                            self.picker.reloadAllComponents()
                             UIApplication.shared.isIdleTimerDisabled = true
+                        }
+                        
+                        switch result {
+                        case .failure:
+                            self.deps.schemeCacheService.getScheme(withId: schemeId) { scheme in
+                                DispatchQueue.main.async {
+                                    if let scheme = scheme {
+                                        onSuccessScheme(scheme)
+                                    } else {
+                                        self.showAlert(title: "Failed qr code", description: nil)
+                                    }
+                                }
+                            }
+                        case .success(let scheme):
+                            onSuccessScheme(scheme)
                         }
                     }
                 case .none:
@@ -90,7 +104,6 @@ extension ARNavigationViewController: ARSessionDelegate {
         
         switch sessionState {
         case .direction(let direction):
-            changeFloorLabel.isHidden = true
             
             if finishLabel.alpha != 0.0 {
                 UIView.animate(withDuration: 0.2) {
@@ -117,13 +130,11 @@ extension ARNavigationViewController: ARSessionDelegate {
             
         case .changeFloor(let floor):
             isScanningQR = true
-            changeFloorLabel.isHidden = false
-            changeFloorLabel.text = "Go to floor \(floor)"
+            arNavigationBar.state.accept(.changeFloor(floor))
             
         case .finish:
             arView.scene.anchors.removeAll()
             arrowAnchor = nil
-            changeFloorLabel.isHidden = true
             if finishLabel.alpha == 0.0 {
 
                 UIView.animate(withDuration: 0.2) {
@@ -135,10 +146,12 @@ extension ARNavigationViewController: ARSessionDelegate {
                         self.finishLabel.transform = .init(scaleX: 0.0, y: 0.0)
                     }, completion: nil)
                     self.schemeSessionManager.accept(nil)
-                    self.picker.reloadAllComponents()
                     self.isScanningQR = true
                 }
             }
+        case .callibrate:
+            isScanningQR = true
+            arNavigationBar.state.accept(.callibrate)
         case .none:
             arView.scene.anchors.removeAll()
             arrowAnchor = nil
@@ -149,29 +162,6 @@ extension ARNavigationViewController: ARSessionDelegate {
         } else {
             debugLabel.text = "REAL POSITION:\nx = \(frame.camera.transform[3][0]);\nz = \(frame.camera.transform[3][2])"
         }
-    }
-}
-
-extension ARNavigationViewController: UIPickerViewDataSource, UIPickerViewDelegate {
-    
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return schemeSessionManager.value?.rooms.count ?? 0
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return schemeSessionManager.value?.rooms[row].name
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        guard let selectedRoomId = schemeSessionManager.value?.rooms[row]._id else {
-            return
-        }
-        
-        schemeSessionManager.value?.startRoute(to: selectedRoomId)
     }
 }
 
@@ -203,15 +193,25 @@ private extension ARNavigationViewController {
             $0.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         }
         
-        apply(picker) {
+        apply(exitButton) {
             view.addSubview($0)
-            $0.dataSource = self
-            $0.delegate = self
+            $0.setImage(UIImage(named: "back-arrow")?.withTintColor(#colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)), for: .normal)
+            $0.backgroundColor = .clear
             
             $0.translatesAutoresizingMaskIntoConstraints = false
-            $0.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-            $0.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-            $0.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+            $0.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10.0).isActive = true
+            $0.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25.0).isActive = true
+        }
+        
+        apply(arNavigationBar) {
+            addChild($0)
+            $0.didMove(toParent: self)
+            
+            view.addSubview($0.view)
+            $0.view.translatesAutoresizingMaskIntoConstraints = false
+            $0.view.centerYAnchor.constraint(equalTo: exitButton.centerYAnchor).isActive = true
+            $0.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20.0).isActive = true
+            $0.view.heightAnchor.constraint(equalToConstant: 25.0).isActive = true
         }
         
         apply(debugLabel) {
@@ -219,11 +219,10 @@ private extension ARNavigationViewController {
             $0.textAlignment = .center
             $0.numberOfLines = 0
             $0.textColor = .gray
-            
+
             $0.translatesAutoresizingMaskIntoConstraints = false
-            $0.topAnchor.constraint(equalTo: view.topAnchor, constant: 30.0).isActive = true
-            $0.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15.0).isActive = true
-            $0.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15.0).isActive = true
+            $0.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+            $0.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         }
         
         apply(finishLabel) {
@@ -238,25 +237,30 @@ private extension ARNavigationViewController {
             $0.textColor = .green
         }
         
-        apply(changeFloorLabel) {
+        apply(selectRoomButton) {
             view.addSubview($0)
-            $0.textAlignment = .center
+            $0.setImage(UIImage(named: "search"), for: .normal)
+            $0.backgroundColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1).withAlphaComponent(0.4)
             
             $0.translatesAutoresizingMaskIntoConstraints = false
-            $0.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-            $0.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-            $0.textColor = .green
+            $0.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10.0).isActive = true
+            $0.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10.0).isActive = true
+            $0.widthAnchor.constraint(equalToConstant: 45.0).isActive = true
+            $0.heightAnchor.constraint(equalToConstant: 45.0).isActive = true
+            $0.layer.cornerRadius = 8.0
         }
         
-        apply(exitButton) {
+        apply(saveButton) {
             view.addSubview($0)
-            $0.setTitle("Back", for: .normal)
-            $0.backgroundColor = .clear
-            $0.setTitleColor(.blue, for: .normal)
+            $0.setImage(UIImage(named: "download"), for: .normal)
+            $0.backgroundColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1).withAlphaComponent(0.4)
             
             $0.translatesAutoresizingMaskIntoConstraints = false
-            $0.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10.0).isActive = true
-            $0.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25.0).isActive = true
+            $0.bottomAnchor.constraint(equalTo: selectRoomButton.topAnchor, constant: -10.0).isActive = true
+            $0.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10.0).isActive = true
+            $0.widthAnchor.constraint(equalToConstant: 45.0).isActive = true
+            $0.heightAnchor.constraint(equalToConstant: 45.0).isActive = true
+            $0.layer.cornerRadius = 8.0
         }
     }
     
@@ -266,13 +270,81 @@ private extension ARNavigationViewController {
                 return $0?.isStart ?? .just(false)
             }
             .bind { [weak self] isStart in
-                self?.picker.isHidden = !isStart
+                self?.selectRoomButton.isHidden = !isStart
+            }
+            .disposed(by: bag)
+        
+        schemeSessionManager
+            .map {
+                return $0 == nil
+            }
+            .bind(to: saveButton.rx.isHidden)
+            .disposed(by: bag)
+        
+        schemeSessionManager
+            .map {
+                return $0 != nil
+            }
+            .bind { [weak self] isSchemeFetched in
+                self?.arNavigationBar.state.accept(isSchemeFetched ? .selectRoute : .default)
             }
             .disposed(by: bag)
         
         exitButton.rx.tap
             .bind { [weak self] in
                 self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: bag)
+        
+        saveButton.rx.tap
+            .withLatestFrom(schemeSessionManager)
+            .bind { [weak self] manager in
+                guard let slf = self else { return }
+                guard let manager = manager else { return }
+                
+                let scheme = manager.scheme
+                
+                slf.deps.schemeCacheService.cache(scheme: scheme) { success in
+                    DispatchQueue.main.async {
+                        if success {
+                            slf.showAlert(title: "Success save", description: nil)
+                            slf.saveButton.isHidden = true
+                        } else {
+                            slf.showAlert(title: "Failed", description: nil)
+                        }
+                    }
+                }
+            }
+            .disposed(by: bag)
+        
+        selectRoomButton.rx.tap
+            .withLatestFrom(schemeSessionManager)
+            .bind { [weak self] manager in
+                guard let slf = self else { return }
+                guard let manager = manager else { return }
+                
+                let rooms = manager.rooms
+                let pointsListVC = PointsListViewController(rooms: rooms)
+                slf.present(pointsListVC, animated: true, completion: nil)
+                
+                pointsListVC.onRoomSelect
+                    .bind { [weak self, weak plvc = pointsListVC] room in
+                        guard let slf = self else { return }
+                        guard slf.schemeSessionManager.value === manager else { return }
+                        
+                        plvc?.dismiss(animated: true, completion: {
+                            manager.startRoute(to: room._id)
+                            slf.arNavigationBar.state.accept(.route(room))
+                        })
+                    }
+                    .disposed(by: slf.bag)
+            }
+            .disposed(by: bag)
+        
+        arNavigationBar.onClose
+            .bind { [weak self] in
+                self?.schemeSessionManager.accept(nil)
+                self?.isScanningQR = true
             }
             .disposed(by: bag)
     }

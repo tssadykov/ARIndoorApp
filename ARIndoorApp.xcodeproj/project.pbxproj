@@ -33,6 +33,8 @@
 		FE49CE0D25F3945700B74208 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE49CDF625F3945700B74208 /* Configuration.swift */; };
 		FE49CE1125F39AFB00B74208 /* BuildingSchemeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE49CE1025F39AFB00B74208 /* BuildingSchemeService.swift */; };
 		FE76D7C225EA69D100147345 /* NavigationArrow.rcproject in Sources */ = {isa = PBXBuildFile; fileRef = FE76D7C125EA69D100147345 /* NavigationArrow.rcproject */; };
+		FE8849DD263FE3E10071E338 /* PointsListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8849DC263FE3E10071E338 /* PointsListViewController.swift */; };
+		FE8849F4264001160071E338 /* ARNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8849F3264001160071E338 /* ARNavigationBar.swift */; };
 		FE892BE525CEDA0100C0C6D0 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE892BE425CEDA0100C0C6D0 /* Utils.swift */; };
 		FE892BE925CEE00700C0C6D0 /* MainScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE892BE825CEE00700C0C6D0 /* MainScreenViewController.swift */; };
 		FE892BEC25D03DDD00C0C6D0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FE892BEB25D03DDD00C0C6D0 /* Main.storyboard */; };
@@ -51,6 +53,7 @@
 		FEDFCE0925F810EF00B778EF /* NavigationArroww.usdz in Resources */ = {isa = PBXBuildFile; fileRef = FEDFCE0825F810EF00B778EF /* NavigationArroww.usdz */; };
 		FEE2C37725FA74F400406850 /* SchemeGraphRouteCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE2C37625FA74F400406850 /* SchemeGraphRouteCalculator.swift */; };
 		FEE2C48326022CBB00406850 /* Furniture.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE2C48226022CBB00406850 /* Furniture.swift */; };
+		FEFCADE0262F4D0500FBA6E6 /* SchemeCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEFCADDF262F4D0500FBA6E6 /* SchemeCacheService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,6 +85,8 @@
 		FE49CDF625F3945700B74208 /* Configuration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		FE49CE1025F39AFB00B74208 /* BuildingSchemeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildingSchemeService.swift; sourceTree = "<group>"; };
 		FE76D7C125EA69D100147345 /* NavigationArrow.rcproject */ = {isa = PBXFileReference; lastKnownFileType = file.rcproject; path = NavigationArrow.rcproject; sourceTree = "<group>"; };
+		FE8849DC263FE3E10071E338 /* PointsListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointsListViewController.swift; sourceTree = "<group>"; };
+		FE8849F3264001160071E338 /* ARNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARNavigationBar.swift; sourceTree = "<group>"; };
 		FE892BE425CEDA0100C0C6D0 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		FE892BE825CEE00700C0C6D0 /* MainScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenViewController.swift; sourceTree = "<group>"; };
 		FE892BEB25D03DDD00C0C6D0 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
@@ -102,6 +107,7 @@
 		FEDFCE0825F810EF00B778EF /* NavigationArroww.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = NavigationArroww.usdz; sourceTree = "<group>"; };
 		FEE2C37625FA74F400406850 /* SchemeGraphRouteCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemeGraphRouteCalculator.swift; sourceTree = "<group>"; };
 		FEE2C48226022CBB00406850 /* Furniture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Furniture.swift; sourceTree = "<group>"; };
+		FEFCADDF262F4D0500FBA6E6 /* SchemeCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemeCacheService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -196,6 +202,15 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		FE8849F1264001030071E338 /* ARNavigationScreen */ = {
+			isa = PBXGroup;
+			children = (
+				FE95BA1725B610E60098856A /* ARNavigationViewController.swift */,
+				FE8849F3264001160071E338 /* ARNavigationBar.swift */,
+			);
+			path = ARNavigationScreen;
+			sourceTree = "<group>";
+		};
 		FE95BA0725B610E60098856A = {
 			isa = PBXGroup;
 			children = (
@@ -221,7 +236,7 @@
 				FEDFCE0825F810EF00B778EF /* NavigationArroww.usdz */,
 				FE95BA1325B610E60098856A /* AppDelegate.swift */,
 				FE95BA1525B610E60098856A /* SceneDelegate.swift */,
-				FE95BA1725B610E60098856A /* ARNavigationViewController.swift */,
+				FE8849F1264001030071E338 /* ARNavigationScreen */,
 				FE95BA1C25B610E70098856A /* Assets.xcassets */,
 				FE95BA1E25B610E70098856A /* LaunchScreen.storyboard */,
 				FE95BA2125B610E70098856A /* Info.plist */,
@@ -233,6 +248,7 @@
 				FEDFCDE725F3C5E200B778EF /* Services */,
 				FEDFCDE425F3C25300B778EF /* UIViewController+Extensions.swift */,
 				FEDFCDF225F67AA700B778EF /* Math.swift */,
+				FE8849DC263FE3E10071E338 /* PointsListViewController.swift */,
 			);
 			path = ARIndoorApp;
 			sourceTree = "<group>";
@@ -246,6 +262,7 @@
 				FEDFCDEC25F64D4B00B778EF /* SchemeSessionManager.swift */,
 				FEDFCDEF25F6515D00B778EF /* RealToSchemePositionMapper.swift */,
 				FEE2C37625FA74F400406850 /* SchemeGraphRouteCalculator.swift */,
+				FEFCADDF262F4D0500FBA6E6 /* SchemeCacheService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -397,11 +414,14 @@
 				FE49CE0825F3945700B74208 /* Elevator.swift in Sources */,
 				FE49CE0125F3945700B74208 /* InlineResponse200.swift in Sources */,
 				FE49CE0B25F3945700B74208 /* JSONEncodingHelper.swift in Sources */,
+				FE8849DD263FE3E10071E338 /* PointsListViewController.swift in Sources */,
 				FE49CE0325F3945700B74208 /* Staircase.swift in Sources */,
 				FEDFCDF325F67AA700B778EF /* Math.swift in Sources */,
 				FEDFCDE125F3BD8800B778EF /* URLPerformer.swift in Sources */,
+				FE8849F4264001160071E338 /* ARNavigationBar.swift in Sources */,
 				FE49CDFD25F3945700B74208 /* APIs.swift in Sources */,
 				FE892BE925CEE00700C0C6D0 /* MainScreenViewController.swift in Sources */,
+				FEFCADE0262F4D0500FBA6E6 /* SchemeCacheService.swift in Sources */,
 				FEE2C37725FA74F400406850 /* SchemeGraphRouteCalculator.swift in Sources */,
 				FE49CE0A25F3945700B74208 /* Extensions.swift in Sources */,
 			);

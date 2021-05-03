@@ -33,8 +33,16 @@ final class MainScreenViewController: UIViewController {
     
     @objc
     private func onNavigationButton(_ sender: UIButton) {
-        let arNavigationVC = ARNavigationViewController(deps: deps)
-        navigationController?.pushViewController(arNavigationVC, animated: true)
+        AVCaptureDevice.requestAccess(for: .video) { isAccessed in
+            DispatchQueue.main.async {
+                if isAccessed {
+                    let arNavigationVC = ARNavigationViewController(deps: self.deps)
+                    self.navigationController?.pushViewController(arNavigationVC, animated: true)
+                } else {
+                    self.showAlert(title: "Need access to camera", description: nil)
+                }
+            }
+        }
     }
     
     // MARK: - Private properties
@@ -50,4 +58,6 @@ final class ApplicationDeps: ARNavigationViewControllerDeps {
     lazy var qrCodeReader: QRCodeReader = QRCodeReaderImpl()
     
     lazy var buildingSchemeService: BuildingSchemeService = BuildingSchemeServiceImpl()
+    
+    lazy var schemeCacheService: SchemeCacheService = SchemeCacheServiceImpl()
 }
